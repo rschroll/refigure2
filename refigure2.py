@@ -25,7 +25,7 @@ worksheets.  Syntax:
 where <plotting command> is any matplotlib command.  The single-command 
 plotting functions may be used without the with block.
 """
-__version__ = "0.1"
+__version__ = "0.2"
 
 import gtk
 # Monkey patch gtk to keep matplotlib from setting the window icon.
@@ -35,7 +35,7 @@ gtk.window_set_default_icon_from_file = lambda x: None
 import matplotlib.pyplot as _p
 from matplotlib.figure import Figure
 import reinteract.custom_result as custom_result
-from threading import Lock
+from threading import RLock
 
 # Set up backend and adjust a few defaults.
 _p.rcParams.update({'figure.figsize': [6.0, 4.5],
@@ -80,14 +80,15 @@ class SuperFigure(Figure, custom_result.CustomResult):
     
     Takes the same optional keywords as matplotlib's figure()."""
     
-    lock = Lock()
+    lock = RLock()
     current_fig = None
     
-    def __init__(self, **figkw):
+    def __init__(self, locking=True, **figkw):
         Figure.__init__(self, **figkw)
         c = FigureCanvas(self)
         # Set this here to allow 'f = figure()'  syntax
-        self.__class__.current_fig = self
+        if not locking:
+            self.__class__.current_fig = self # Another thread can tweak this!
     
     def __enter__(self):
         self.__class__.lock.acquire()
@@ -179,18 +180,18 @@ _solo_funcs = ('acorr', 'barbs', 'bar', 'barh', 'broken_barh', 'boxplot',
 def _make_func(name):
     pfunc = getattr(_p,name)
     def func(*args, **kw):
-        if gcf() is None:
-            with figure() as f:
-                pfunc(*args, **kw)
-            return f
-        else:
-            return pfunc(*args, **kw)
+        SuperFigure.lock.acquire()
+        try:
+            if gcf() is None:
+                with figure() as f:
+                    pfunc(*args, **kw)
+                return f
+            else:
+                return pfunc(*args, **kw)
+        finally:
+            SuperFigure.lock.release()
     func.__doc__ = pfunc.__doc__
     return func
 
 for cmd in _solo_funcs:
     exec("%s = _make_func('%s')"%(cmd,cmd))
-
-# Bugs
-# - Nested with blocks will hang the calculation of a worksheet.  The probably
-#   won't ever work anyway, but it'd be nice to fail more gracefully than this.
