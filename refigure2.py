@@ -178,7 +178,11 @@ _solo_funcs = ('acorr', 'barbs', 'bar', 'barh', 'broken_barh', 'boxplot',
                 'psd', 'quiver', 'scatter', 'specgram', 'spy', 'stem', 'xcorr')
 
 def _make_func(name):
-    pfunc = getattr(_p,name)
+    try:
+        pfunc = getattr(_p,name)
+    except AttributeError:
+        return None
+    
     def func(*args, **kw):
         SuperFigure.lock.acquire()
         try:
@@ -193,5 +197,7 @@ def _make_func(name):
     func.__doc__ = pfunc.__doc__
     return func
 
-for cmd in _solo_funcs:
-    exec("%s = _make_func('%s')"%(cmd,cmd))
+for _cmd in _solo_funcs:
+    _func = _make_func(_cmd)
+    if _func is not None:
+        exec("%s = _func"%_cmd)
