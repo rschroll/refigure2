@@ -175,7 +175,8 @@ _solo_funcs = ('acorr', 'barbs', 'bar', 'barh', 'broken_barh', 'boxplot',
                 'cohere', 'contour', 'contourf', 'csd', 'errorbar', 'fill',
                 'fill_between', 'hexbin', 'hist', 'imshow', 'loglog', 'pcolor',
                 'pcolormesh', 'pie', 'plot', 'plot_date', 'plotfile', 'polar',
-                'psd', 'quiver', 'scatter', 'specgram', 'spy', 'stem', 'xcorr')
+                'psd', 'quiver', 'scatter', 'semilogx', 'semilogy', 'specgram',
+                'spy', 'stem', 'xcorr')
 
 def _make_func(name):
     try:
