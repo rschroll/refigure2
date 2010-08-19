@@ -1,0 +1,62 @@
+# The refigure2 module has the same goals as the older refigure 
+# module, but with a different implementation and syntax.  refigure2 
+# aims to allow existing plotting routines using the matplotlib 
+# module to be used without modification.  To do this, it takes 
+# slightly more boilerplate, but I think the increased flexibility 
+# makes up for this.
+# 
+# As before, refigure2 imports matplotlib.pyplot, automatically.  It
+# also tries to avoid polluting your name space, so importing 
+# directly is okay.
+from refigure2 import *
+# Often times, you will want numpy as well.
+from numpy import *
+
+t = arange(0.0, 2.0, 0.01)
+s = sin(2*pi*t)
+
+# All of the single-command plotting functions from pyplot have been
+# wrapped so that they can be used directly:
+plot(t,s, 'r--')
+imshow([[1,2],[3,4]])
+
+# For several commands to be executed on the same figure, they must
+# appear together in a with statement:
+with figure() as f:
+    plot(t, s, linewidth=1.0)
+    xlabel('time (s)')
+    ylabel('voltage (mV)')
+    title('About as simple as it gets, folks')
+    grid(True)
+    f
+
+# The 'with figure() as f' syntax creates a new figure and assigns
+# it to the variable f.  This can be used just like a regular
+# matplotlib figure.  In refigure2, matplotlib's object oriented
+# interface is just as easy to use as its proceedural interface.
+with figure() as f:
+    ax = f.add_subplot(111)
+    ax.plot(t,s)
+    f
+
+# The final line 'f' tells refigure to display the figure.  This
+# doesn't necessarily have to occur within the with block:
+with figure() as f:
+    plot(t, s, 'g:')
+print "I'll plot the figure with the next command."
+f
+
+# Any plotting command can be put into such a with block, not just
+# the pyplot commands.  If you have plotting functions defined in
+# a module, for example
+def myplot(th, r):
+    subplot(121)
+    plot(th, r)
+    subplot(122, polar=True)
+    plot(th, r)
+# it can be used with refigure2:
+with figure() as f:
+    myplot(t*pi, abs(s))
+    f
+
+    

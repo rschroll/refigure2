@@ -1,0 +1,27 @@
+from refigure2 import *
+
+# Sometimes, you may not be sure how to create a certain plot.  In
+# these cases, it is often helpful to be able to use introspection
+# to figure out what methods various plot objects have.  Doing this
+# within a with block can be tedious, so refigure2 actually allows
+# you prepare figures outside of with blocks:
+f = figure(locking=False)
+a = subplot(111)
+[s for s in dir(a) if s.find('log') != -1]
+print a.semilogy.__doc__[:224]
+a.semilogy()
+plot([1,100,10])
+f
+
+# That seemed to work okay, didn't it?  But if you go back and edit
+# one of the commands, you'll see that Reinteract was not able to
+# properly revert to the previous state.  Moreover, further
+# single-line commands will appear on this existing figure, which
+# may not be desired.  Additionally, this method doesn't use the 
+# locking mechanism available in the with blocks.  If several 
+# worksheets are executed at the same time (when Reinteract starts,
+# for example), plot elements may show up on the wrong figure.
+# 
+# Therefore, this syntax should only be used when figuring out how
+# to create a figure.  As soon as it is working, it should be
+# changed to a with block.
