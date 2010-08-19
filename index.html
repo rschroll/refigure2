@@ -97,7 +97,7 @@ matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 creation of figures with multiple axes.  Additionally, the inclusion
 of the figure's toolbar allows interactive panning, zooming, and more.</li>
 <li>Most<a class="note" href="#note">&#8224;</a> of the pylab commands are available.  They are grouped together within a <tt>with</tt> block in order to operate on a single figure</li>
-<li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the <a href="" title="Reinteract notebook in a gzipped tar file">refigure2 gallery</a> for examples.
+<li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the refigure2 gallery [<a href="http://github.com/rschroll/refigure2/tarball/gallery" title="Reinteract notebook in a gzipped tar file">.tar.gz</a>|<a href="http://github.com/rschroll/refigure2/zipball/gallery" title="Reinteract notebook in a zip file">.zip</a>] for examples.
 </ol>
 
 <h2><a name="news">What's New</a></h2>
@@ -141,9 +141,7 @@ include these commands <em>before</em> importing refigure2:</p>
 <pre> use('GTKAgg')</pre>
 <p>(<tt>'GTK'</tt> or <tt>'GTKCairo'</tt> may be used instead.)</p>
 
-<p>More details can be found in the 
-<a href="refigure-tut.tar.gz">refigure2 tutorial</a>. This tutorial is
-a Reinteract notebook in a gzipped tar file.</p>
+<p>More details can be found in the refigure2 tutorial [<a href="http://github.com/rschroll/refigure2/tarball/tutorial" title="Reinteract notebook in a gzipped tar file">.tar.gz</a>|<a href="http://github.com/rschroll/refigure2/zipball/tutorial" title="Reinteract notebook in a zip file">.zip</a>].</p>
 
 <p class="note"><a class="note" name="note">&#8224;</a> Most of the pylab commands work in refigure.  <tt>ginput()</tt> is known not to work; others may also fail. <tt>show()</tt> and <tt>draw()</tt> don't work, but they aren't needed.  <tt>figure()</tt> works differently in refigure than in matplotlib; see the tutorial for details.</p>
 
