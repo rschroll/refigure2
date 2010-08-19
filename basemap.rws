@@ -1,0 +1,20 @@
+from refigure2 import *
+from numpy import *
+from mpl_toolkits.basemap import Basemap
+
+m = Basemap(projection='robin', lon_0=0, resolution='c')
+with figure(figsize=(6,3)) as f:
+    subplots_adjust(0.01,0.01,0.99,0.99)
+    z = m.drawcoastlines()
+    z = m.drawcountries()
+    z = m.drawmapboundary(fill_color='aqua')
+    z = m.fillcontinents(color='coral', lake_color='aqua')
+    z = m.drawparallels(r_[-90:120:30])
+    z = m.drawmeridians(r_[0:360:30])
+    f
+
+with figure(figsize=(6,3)) as f:
+    subplots_adjust(0.01,0.01,0.99,0.99)
+    m.bluemarble(scale=0.1)
+    f
+

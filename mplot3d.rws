@@ -1,0 +1,19 @@
+from refigure2 import *
+from numpy import *
+from mpl_toolkits.mplot3d import Axes3D
+
+X = r_[-5:5:0.25]
+Y = r_[-5:5:0.25]
+X,Y = meshgrid(X,Y)
+Z = sin(sqrt(X**2 + Y**2))
+
+with figure() as f:
+    ax = Axes3D(f)
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap=cm.jet)
+    f
+
+from mpl_toolkits.mplot3d import axes3d
+with figure() as f:
+    ax = Axes3D(f)
+    ax.contour(*axes3d.get_test_data(0.05), levels=16, extend3d=True)
+    f
