@@ -93,9 +93,7 @@ div.new{
 matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 
 <ol>
-<li>Entire figures are embedded in the notebook. This allows the
-creation of figures with multiple axes.  Additionally, the inclusion
-of the figure's toolbar allows interactive panning, zooming, and more.</li>
+<li>Entire figures are embedded in the notebook. This allows the creation of figures with multiple axes.  Additionally, the inclusion of the figure's toolbar allows interactive panning, zooming, and more.</li>
 <li>Most<a class="note" href="#note">&#8224;</a> of the pylab commands are available.  They are grouped together within a <tt>with</tt> block in order to operate on a single figure</li>
 <li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the refigure2 gallery [<a href="http://github.com/rschroll/refigure2/tarball/gallery" title="Reinteract notebook in a gzipped tar file">.tar.gz</a>|<a href="http://github.com/rschroll/refigure2/zipball/gallery" title="Reinteract notebook in a zip file">.zip</a>] for examples.
 </ol>
@@ -111,10 +109,9 @@ of the figure's toolbar allows interactive panning, zooming, and more.</li>
 <img src="screenshot.png" width="491", height="689" alt="Screenshot" />
 
 <h2><a name="get">Getting It</a></h2>
-<p>Download the <a href="http://github.com/rschroll/refigure2/raw/master/refigure2.py">single .py file</a>.  Place it
-in your <tt>~/.reinteract/modules</tt> folder, which you may need to
-create.  (It can also go in the <tt>reinteract/lib</tt> folder of your
-Reinteract installation, or somewhere else on your <tt>sys.path</tt>.)</p>
+<p>Download the <a href="http://github.com/rschroll/refigure2/raw/master/refigure2.py">single .py file</a>.  Place it in your <tt>~/.reinteract/modules</tt> folder, which you may need to create.  (It can also go in the <tt>reinteract/lib</tt> folder of your Reinteract installation, or somewhere else on your <tt>sys.path</tt>.)</p>
+
+<p>refigure2 is hosted at <a href="http://github.com/rschroll/refigure2">github</a>, so if you want to hack it, you can clone the repository <tt>git://github.com/rschroll/refigure2.git</tt></p>
 
 <h2><a name="use">Using It</a></h2>
 <p>Import the refigure2 module.  For interactive work, I find it much easier to import it into the current namespace.  refigure2 tries to avoid unnecessary namespace pollution.</pre>
@@ -133,10 +130,7 @@ Reinteract installation, or somewhere else on your <tt>sys.path</tt>.)</p>
      f
 </pre>
 
-<p>refigure2 requires the use a GTK-based backend.  If
-you use another backend by default, refigure2 will attempt to select
-an appropriate GTK backend.  Should you wish to override this choice,
-include these commands <em>before</em> importing refigure2:</p>
+<p>refigure2 requires the use a GTK-based backend.  If you use another backend by default, refigure2 will attempt to select an appropriate GTK backend.  Should you wish to override this choice, include these commands <em>before</em> importing refigure2:</p>
 <pre> from matplotlib import use</pre>
 <pre> use('GTKAgg')</pre>
 <p>(<tt>'GTK'</tt> or <tt>'GTKCairo'</tt> may be used instead.)</p>
@@ -146,17 +140,14 @@ include these commands <em>before</em> importing refigure2:</p>
 <p class="note"><a class="note" name="note">&#8224;</a> Most of the pylab commands work in refigure.  <tt>ginput()</tt> is known not to work; others may also fail. <tt>show()</tt> and <tt>draw()</tt> don't work, but they aren't needed.  <tt>figure()</tt> works differently in refigure than in matplotlib; see the tutorial for details.</p>
 
 <h2><a name="issues">Known Issues</a></h2>
+
+<p>Bugs will be tracked on the <a href="http://github.com/rschroll/refigure2/issues">github issue tracker</a>.</p>
+
 <p><tt>ginput()</tt> is known not to work.  Other functions may also fail &mdash; please report them.</p>
 
-<p>Settings made in <tt>rcParams</tt> leak between open
-worksheets, even if they're not part of the same notebook.  This is because modules are singletons in Python.  Therefore, all open worksheets share the same refigure object, which contains <tt>rcParams</tt>.  Reinteract must be
-completely closed to reset these settings (or you can manually tweak
-<tt>rcParams</tt>).  I don't know if this is fixable within
-refigure.  As a work-around, <tt>rclocal</tt> can be used to adjust <tt>rcParams</tt> for the current figure only.</p>
+<p>Settings made in <tt>rcParams</tt> leak between open worksheets, even if they're not part of the same notebook.  This is because modules are singletons in Python.  Therefore, all open worksheets share the same refigure2 object, which contains <tt>rcParams</tt>.  Reinteract must be completely closed to reset these settings (or you can manually tweak <tt>rcParams</tt>).  I don't know if this is fixable within refigure2.  As a work-around, <tt>rclocal</tt> can be used to adjust <tt>rcParams</tt> for the current figure only.</p>
 
-<p>refigure2 is known to work with versions 0.98.5.2&ndash;0.99.1.1 of matplotlib. 
-Please let me know if it works (or doesn't) with other versions of
-matplotlib.</p>
+<p>refigure2 is known to work with versions 0.98.5.2&ndash;0.99.1.1 of matplotlib. Please let me know if it works (or doesn't) with other versions of matplotlib.</p>
 
 <ul id="contents">
 <li><a href="#top">Top</a></li>
