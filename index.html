@@ -1,86 +1,177 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>refigure2</title>
+<style type="text/css">
+body{
+	padding-left: 10em;
+	font-family: sans-serif;
+}
 
-	<title>rschroll/refigure2 @ GitHub</title>
-	
-	<style type="text/css">
-		body {
-  		margin-top: 1.0em;
-  		background-color: #bb2c4e;
-		  font-family: "Helvetica,Arial,FreeSans";
-  		color: #ffffff;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-		h1 { font-size: 3.8em; color: #44d3b1; margin-bottom: 3px; }
-		h1 .small { font-size: 0.4em; }
-		h1 a { text-decoration: none }
-		h2 { font-size: 1.5em; color: #44d3b1; }
-    h3 { text-align: center; color: #44d3b1; }
-    a { color: #44d3b1; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-		pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-	</style>
-	
+dt{
+	float: left;
+	padding-right: 0.5ex;
+	font-style: italic;
+}
+
+h1{
+	font-size: 200%;
+	margin: 0.5em, 0em, 0.5em, 0em;
+}
+h1 span{
+	font-style: italic;
+	color: red;
+}
+
+h2{ font-size: 150%; }
+
+h3{
+	float: left;
+	font-size: 150%;
+	margin: 0em;
+	margin-top: -0.33em;
+	padding-right: 1ex;
+	font-weight: bold;
+}
+
+/*
+pre{ margin: 0em; }
+pre:before{
+	content: " ";
+	background: blue;
+	border: 1px solid black;
+	margin-right: 2px;
+}
+pre.cont:before{
+	border-top: 1px solid blue;
+}
+*/
+pre{
+	margin: 0;
+	background: blue;
+	border: 1px solid black;
+	width: 0.8ex;
+	overflow: visible;
+}
+
+tt{ white-space: pre; }
+p.note{ font-size: smaller; }
+a.note{
+	vertical-align: super;
+	font-size: 0.75em;
+	line-height: 1em;
+}
+
+#contents{
+	position: fixed;
+	left: 1em;
+	top: 4em;
+	width: 8em;
+	padding-left: 0em;
+}
+#contents li{
+	list-style: none;
+	text-align: right;
+}
+
+div.new{
+	border: thick solid #999;
+	background: #efe0d0;
+	padding: 0em 1em;
+}
+</style>
 </head>
-
 <body>
-  <a href="http://github.com/rschroll/refigure2"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<h1><a name="top">refigure<span>2</span></a></h1>
 
-  <div id="container">
+<p><em>refigure2</em> is an extension for <a href="http://www.reinteract.org/">Reinteract</a> that allows the embedding of <a href="http://matplotlib.sourceforge.net/">matplotlib</a> plots.  It does so with a syntax reminiscent of <a href="http://matplotlib.sourceforge.net/pylab_commands.html">pylab</a>, matplotlib's procedural (MATLAB&trade;-like) interface.  refigure2 is a spiritual successor to <a href="http://jfi.uchicago.edu/~rschroll/refigure/">refigure</a>, though the two share little code and less syntax.</p>
 
-    <div class="download">
-      <a href="http://github.com/rschroll/refigure2/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/rschroll/refigure2/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
+<h2><a name="features">Features</a></h2>
+<p><a href="http://git.fishsoup.net/cgit/reinteract/tree/lib/replot.py">Other</a> 
+<a href="http://www.reinteract.org/trac/ticket/33">extensions</a> 
+<a href="http://ramshacklecode.googlepages.com/#rematplotlib">embed</a>
+matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 
-    <h1><a href="http://github.com/rschroll/refigure2">refigure2</a>
-      <span class="small">by <a href="http://github.com/rschroll">rschroll</a></span></h1>
+<ol>
+<li>Entire figures are embedded in the notebook. This allows the
+creation of figures with multiple axes.  Additionally, the inclusion
+of the figure's toolbar allows interactive panning, zooming, and more.</li>
+<li>Most<a class="note" href="#note">&#8224;</a> of the pylab commands are available.  They are grouped together within a <tt>with</tt> block in order to operate on a single figure</li>
+<li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the <a href="" title="Reinteract notebook in a gzipped tar file">refigure2 gallery</a> for examples.
+</ol>
 
-    <div class="description">
-      Plotting extension for Reinteract
-    </div>
+<h2><a name="news">What's New</a></h2>
+<h3>0.2</h3>
+<p>The locking mechanism has been fixed.</p>
 
-    <p>refigure2 is a plotting extension for Reinteract that allows the use of the pylab syntax of matplotlib.</p><h2>Dependencies</h2>
-<p>Reinteract and matplotlib</p>
-<h2>Install</h2>
-<p>Put the single .py file somewhere in your Python path</p>
-<h2>License</h2>
-<p>BSD</p>
-<h2>Authors</h2>
-<p>Robert Schroll</p>
-<h2>Contact</h2>
-<p>rschroll AT gmail.com<br/>      </p>
+<h3>0.1</h3>
+<p>Initial release.</p>
 
+<h2><a name="screenshot">Screenshot</a></h2>
+<img src="screenshot.png" width="491", height="689" alt="Screenshot" />
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/rschroll/refigure2/zipball/master">zip</a> or
-      <a href="http://github.com/rschroll/refigure2/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/rschroll/refigure2</pre>
-    </p>
+<h2><a name="get">Getting It</a></h2>
+<p>Download the <a href="http://github.com/rschroll/refigure2/blob/master/refigure2.py">single .py file</a>.  Place it
+in your <tt>~/.reinteract/modules</tt> folder, which you may need to
+create.  (It can also go in the <tt>reinteract/lib</tt> folder of your
+Reinteract installation, or somewhere else on your <tt>sys.path</tt>.)</p>
 
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/rschroll/refigure2">rschroll/refigure2</a>
-    </div>
+<h2><a name="use">Using It</a></h2>
+<p>Import the refigure2 module.  For interactive work, I find it much easier to import it into the current namespace.  refigure2 tries to avoid unnecessary namespace pollution.</pre>
+<pre> from refigure2 import *</pre>
+<p>You'll almost always want numpy as well do:</p>
+<pre> from numpy import *</pre>
 
-  </div>
+<p>Single pylab commands<a class="note" href="#note">&#8224;</a> can be given alone, to create simple plots:</p>
 
-  
+<pre> plot([1,2,3])</pre>
+<p>Multiple pylab commands can be grouped together in a <tt>with</tt> block.</p>
+<pre> with figure() as f:
+     plot([1,2,3])
+     ylim(0,5)
+     title('Plot title')
+     f
+</pre>
+
+<p>refigure2 requires the use a GTK-based backend.  If
+you use another backend by default, refigure2 will attempt to select
+an appropriate GTK backend.  Should you wish to override this choice,
+include these commands <em>before</em> importing refigure2:</p>
+<pre> from matplotlib import use</pre>
+<pre> use('GTKAgg')</pre>
+<p>(<tt>'GTK'</tt> or <tt>'GTKCairo'</tt> may be used instead.)</p>
+
+<p>More details can be found in the 
+<a href="refigure-tut.tar.gz">refigure2 tutorial</a>. This tutorial is
+a Reinteract notebook in a gzipped tar file.</p>
+
+<p class="note"><a class="note" name="note">&#8224;</a> Most of the pylab commands work in refigure.  <tt>ginput()</tt> is known not to work; others may also fail. <tt>show()</tt> and <tt>draw()</tt> don't work, but they aren't needed.  <tt>figure()</tt> works differently in refigure than in matplotlib; see the tutorial for details.</p>
+
+<h2><a name="issues">Known Issues</a></h2>
+<p><tt>ginput()</tt> is known not to work.  Other functions may also fail &mdash; please report them.</p>
+
+<p>Settings made in <tt>rcParams</tt> leak between open
+worksheets, even if they're not part of the same notebook.  This is because modules are singletons in Python.  Therefore, all open worksheets share the same refigure object, which contains <tt>rcParams</tt>.  Reinteract must be
+completely closed to reset these settings (or you can manually tweak
+<tt>rcParams</tt>).  I don't know if this is fixable within
+refigure.  As a work-around, <tt>rclocal</tt> can be used to adjust <tt>rcParams</tt> for the current figure only.</p>
+
+<p>refigure2 is known to work with versions 0.98.5.2&ndash;0.99.1.1 of matplotlib. 
+Please let me know if it works (or doesn't) with other versions of
+matplotlib.</p>
+
+<ul id="contents">
+<li><a href="#top">Top</a></li>
+
+<li><a href="#features">Features</a></li>
+<li><a href="#news">What's New</a></li>
+<li><a href="#screenshot">Screenshot</a></li>
+<li><a href="#get">Getting It</a></li>
+<li><a href="#use">Using It</a></li>
+<li><a href="#issues">Known Issues</a></li>
+</ul>
+
+<p class="note">Robert Schroll, rschroll at gmail dot com</p>
 </body>
+
 </html>
