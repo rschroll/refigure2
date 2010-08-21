@@ -92,8 +92,8 @@ matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 
 <ol>
 <li>Entire figures are embedded in the notebook. This allows the creation of figures with multiple axes.  Additionally, the inclusion of the figure's toolbar allows interactive panning, zooming, and more.</li>
-<li>Most<a class="note" href="#note">&#8224;</a> of the pylab commands are available.  They are grouped together within a <code>with</code> block in order to operate on a single figure</li>
-<li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the refigure2 gallery [<a href="http://github.com/rschroll/refigure2/tarball/gallery" title="Reinteract notebook in a gzipped tar file">.tar.gz</a>|<a href="http://github.com/rschroll/refigure2/zipball/gallery" title="Reinteract notebook in a zip file">.zip</a>] for examples.
+<li>Most<a class="note" href="#note">&#8224;</a> of the pylab commands are available.  They are grouped together within a <code>with</code> block in order to operate on a single figure.</li>
+<li>Existing plotting routines based on matplotlib can be used unchanged, provided that they don't insist on creating their own figures for plotting.  This means that refigure2 is compatible with toolkits like <a href="http://matplotlib.sourceforge.net/basemap/doc/html/">Basemap</a> and <a href="http://matplotlib.sourceforge.net/mpl_toolkits/mplot3d/index.html">mplot3d</a>.  See the refigure2 gallery [<a href="http://github.com/rschroll/refigure2/tarball/gallery" title="Reinteract notebook in a gzipped tar file">.tar.gz</a>|<a href="http://github.com/rschroll/refigure2/zipball/gallery" title="Reinteract notebook in a zip file">.zip</a>] for examples.</li>
 </ol>
 
 <h2><a id="news">What's New</a></h2>
@@ -105,6 +105,11 @@ matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 
 <h2><a id="screenshot">Screenshot</a></h2>
 <img src="screenshot.png" width="491" height="689" alt="Screenshot" />
+
+<h2><a id="get">Getting It</a></h2>
+<p>Download the <a href="http://github.com/rschroll/refigure2/raw/master/refigure2.py">single .py file</a>.  Place it in your <code>~/.reinteract/modules</code> folder, which you may need to create.  (It can also go in the <code>reinteract/lib</code> folder of your Reinteract installation, or somewhere else on your <code>sys.path</code>.)</p>
+
+<p>refigure2 is hosted at <a href="http://github.com/rschroll/refigure2">github</a>, so if you want to hack it, you can clone the repository <code>git://github.com/rschroll/refigure2.git</code></p>
 
 <h2><a id="use">Using It</a></h2>
 <p>Import the refigure2 module.  For interactive work, I find it much easier to import it into the current namespace.  refigure2 tries to avoid unnecessary namespace pollution.</p>
