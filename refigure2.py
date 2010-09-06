@@ -27,7 +27,10 @@ plotting functions may be used without the with block.
 """
 __version__ = "0.2"
 
+import os
+import tempfile
 import gtk
+import cairo
 # Monkey patch gtk to keep matplotlib from setting the window icon.
 # This can't be an intelligent thing to do....
 gtk.window_set_default_icon_from_file = lambda x: None
@@ -59,7 +62,9 @@ your matplotlibrc file, or before importing refigure run
 """
     
 _gui_elements = ['FigureCanvas'+_backend, 'NavigationToolbar2'+_backend]
-if _backend == 'GTKCairo': _gui_elements[1] = 'NavigationToolbar2GTK'
+if _backend == 'GTKCairo': 
+    _gui_elements[1] = 'NavigationToolbar2GTK'
+    from matplotlib.backends.backend_cairo import RendererCairo 
 _temp = __import__('matplotlib.backends.backend_' + _backend.lower(),
                     globals(), locals(), _gui_elements)
 FigureCanvas = getattr(_temp, _gui_elements[0])
@@ -116,8 +121,63 @@ class SuperFigure(Figure, custom_result.CustomResult):
         box.show_all()
         toolbar.connect("realize", lambda widget:
             widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR)))
-#        box.print_widget = new.instancemethod(print_fig(self), box, gtk.VBox)
         return box
+    
+    def print_result(self, context, render):
+        cr = context.get_cairo_context()
+        cdpi = context.get_dpi_x()
+        width, height = self.get_size_inches()
+        width *= cdpi
+        height *= cdpi
+
+        if render:
+            if _backend == "GTKCairo":
+                renderer = RendererCairo(self.dpi)
+                renderer.set_width_height(width, height)
+                # Want to create surface similar to eventual target,
+                # but that doesn't work with a PDFSurface....
+                #surf = cr.get_target().create_similar(cairo.CONTENT_COLOR_ALPHA, width, height)
+                # So explicitly make a PDFSurface.  We don't need to have
+                # it associated with a file, so pass None as first argument.
+                # Except that also doesn't work.  So give it a tempfile that
+                # will be destroyed as soon as it is closed.
+                surf = cairo.PDFSurface(tempfile.TemporaryFile(), width, height)
+                renderer.set_ctx_from_surface(surf)
+
+                # From backend_bases.FigureCanvasBase.print_figure()
+                origDPI = self.dpi
+                origfacecolor = self.get_facecolor()
+                origedgecolor = self.get_edgecolor()
+                self.dpi = cdpi
+                self.set_facecolor('w')
+                self.set_edgecolor('w')
+                try:
+                    self.draw(renderer)
+                finally:
+                    self.dpi = origDPI
+                    self.set_facecolor(origfacecolor)
+                    self.set_edgecolor(origedgecolor)
+
+                cr.set_source_surface(surf, 0, 0)
+                cr.paint()
+                surf.finish()
+
+            else:
+                r,w = os.pipe()
+                rf = os.fdopen(r, 'r')
+                wf = os.fdopen(w, 'w')
+                self.savefig(wf, format='png') #, dpi=context.get_dpi_x())
+                wf.close()
+                image = cairo.ImageSurface.create_from_png(rf)
+                rf.close()
+
+                sf = cdpi/_p.rcParams['savefig.dpi']
+                cr.scale(sf, sf)
+                cr.set_source_surface(image, 0, 0)
+                cr.paint()
+
+        return height
+
 
 # Can't modify class docstring, for some reason....
 #SuperFigure.__doc__ += _p.figure.__doc__.split("Optional keyword arguments:", 1)[-1]
