@@ -62,9 +62,14 @@ your matplotlibrc file, or before importing refigure run
 """
     
 _gui_elements = ['FigureCanvas'+_backend, 'NavigationToolbar2'+_backend]
-if _backend == 'GTKCairo': 
+if _backend == 'GTKCairo':
     _gui_elements[1] = 'NavigationToolbar2GTK'
-    from matplotlib.backends.backend_cairo import RendererCairo 
+    from matplotlib.backends.backend_cairo import RendererCairo
+else:
+    try:
+        import poppler
+    except ImportError:
+        poppler = None
 _temp = __import__('matplotlib.backends.backend_' + _backend.lower(),
                     globals(), locals(), _gui_elements)
 FigureCanvas = getattr(_temp, _gui_elements[0])
@@ -161,6 +166,16 @@ class SuperFigure(Figure, custom_result.CustomResult):
                 cr.set_source_surface(surf, 0, 0)
                 cr.paint()
                 surf.finish()
+
+            elif poppler is not None:
+                # savefig with PDFs doesn't like pipes.
+                fd, fn = tempfile.mkstemp()
+                os.close(fd)
+                self.savefig(fn, format='pdf')
+                page = poppler.document_new_from_file('file://' + fn, None).get_page(0)
+                os.unlink(fn)
+                
+                page.render(cr)
 
             else:
                 r,w = os.pipe()
