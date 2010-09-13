@@ -97,16 +97,12 @@ class SuperFigure(Figure, custom_result.CustomResult):
         # __init__ and here!
         self.__class__.current_fig = self
         self.prev_rc = setOnceDict()
-        self.roc = _reinteract_output.func_code
-        _reinteract_output.func_code = _do_nothing.func_code
         return self
     
     def __exit__(self, type, value, traceback):
         self.__class__.current_fig = None
         _p.rcParams.update(self.prev_rc)
         self.__class__.lock.release()
-        _reinteract_output.func_code = self.roc
-        _reinteract_output(self)
 
     def create_widget(self):
         c = self.canvas
@@ -122,11 +118,6 @@ class SuperFigure(Figure, custom_result.CustomResult):
             widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR)))
 #        box.print_widget = new.instancemethod(print_fig(self), box, gtk.VBox)
         return box
-
-_reinteract_output = lambda x: None
-def set_output(func):
-    global _reinteract_output
-    _reinteract_output = func
 
 # Can't modify class docstring, for some reason....
 #SuperFigure.__doc__ += _p.figure.__doc__.split("Optional keyword arguments:", 1)[-1]
