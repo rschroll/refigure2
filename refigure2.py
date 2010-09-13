@@ -36,6 +36,7 @@ import matplotlib.pyplot as _p
 from matplotlib.figure import Figure
 import reinteract.custom_result as custom_result
 from threading import RLock
+import inspect
 
 # Set up backend and adjust a few defaults.
 _p.rcParams.update({'figure.figsize': [6.0, 4.5],
@@ -83,9 +84,10 @@ class SuperFigure(Figure, custom_result.CustomResult):
     lock = RLock()
     current_fig = None
     
-    def __init__(self, locking=True, **figkw):
+    def __init__(self, locking=True, disable_output=True, **figkw):
         Figure.__init__(self, **figkw)
         c = FigureCanvas(self)
+        self._disable_output = disable_output
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
             self.__class__.current_fig = self # Another thread can tweak this!
@@ -97,12 +99,29 @@ class SuperFigure(Figure, custom_result.CustomResult):
         # __init__ and here!
         self.__class__.current_fig = self
         self.prev_rc = setOnceDict()
+        self._disable_reinteract_output()
         return self
     
     def __exit__(self, type, value, traceback):
         self.__class__.current_fig = None
         _p.rcParams.update(self.prev_rc)
+        self._restore_reinteract_output()
+        self._output_figure()
         self.__class__.lock.release()
+    
+    def _disable_reinteract_output(self):
+        self.frame = inspect.currentframe()
+        while not self.frame.f_globals.has_key('reinteract_output'):
+            self.frame = self.frame.f_back
+        self.old_reinteract_output = self.frame.f_globals['reinteract_output']
+        if self._disable_output:
+            self.frame.f_globals['reinteract_output'] = lambda *args: None
+    
+    def _restore_reinteract_output(self):
+        self.frame.f_globals['reinteract_output'] = self.old_reinteract_output
+    
+    def _output_figure(self):
+        self.frame.f_globals['reinteract_output'](self)
 
     def create_widget(self):
         c = self.canvas
