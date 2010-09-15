@@ -207,9 +207,8 @@ def _make_func(name):
         SuperFigure.lock.acquire()
         try:
             if gcf() is None:
-                with figure() as f:
+                with figure():
                     pfunc(*args, **kw)
-                return f
             else:
                 return pfunc(*args, **kw)
         finally:
