@@ -39,7 +39,11 @@ import matplotlib.pyplot as _p
 from matplotlib.figure import Figure
 import reinteract.custom_result as custom_result
 from threading import RLock
-import inspect
+from reinteract.statement import Statement
+if hasattr(Statement, 'get_current'):
+    _get_curr_statement = lambda: Statement.get_current()
+else:
+    _get_curr_statement = lambda: None
 
 # Set up backend and adjust a few defaults.
 _p.rcParams.update({'figure.figsize': [6.0, 4.5],
@@ -120,18 +124,19 @@ class SuperFigure(Figure, custom_result.CustomResult):
         self.__class__.lock.release()
     
     def _disable_reinteract_output(self):
-        self.frame = inspect.currentframe()
-        while not self.frame.f_globals.has_key('reinteract_output'):
-            self.frame = self.frame.f_back
-        self.old_reinteract_output = self.frame.f_globals['reinteract_output']
-        if self._disable_output:
-            self.frame.f_globals['reinteract_output'] = lambda *args: None
+        self.statement = _get_curr_statement()
+        if self.statement is not None:
+            self.old_reinteract_output = self.statement.result_scope['reinteract_output']
+            if self._disable_output:
+                self.statement.result_scope['reinteract_output'] = lambda *args: None
     
     def _restore_reinteract_output(self):
-        self.frame.f_globals['reinteract_output'] = self.old_reinteract_output
+        if self.statement is not None:
+            self.statement.result_scope['reinteract_output'] = self.old_reinteract_output
     
     def _output_figure(self):
-        self.frame.f_globals['reinteract_output'](self)
+        if self.statement is not None:
+            self.statement.result_scope['reinteract_output'](self)
 
     def create_widget(self):
         c = self.canvas
