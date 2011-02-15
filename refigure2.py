@@ -37,6 +37,7 @@ gtk.window_set_default_icon_from_file = lambda x: None
 
 import matplotlib.pyplot as _p
 from matplotlib.figure import Figure
+from matplotlib.backend_bases import FigureCanvasBase
 import reinteract.custom_result as custom_result
 from threading import RLock
 from reinteract.statement import Statement
@@ -100,7 +101,7 @@ class SuperFigure(Figure, custom_result.CustomResult):
     
     def __init__(self, locking=True, disable_output=True, **figkw):
         Figure.__init__(self, **figkw)
-        c = FigureCanvas(self)
+        c = FigureCanvasBase(self) # For savefig to work
         self._disable_output = disable_output
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
@@ -139,7 +140,7 @@ class SuperFigure(Figure, custom_result.CustomResult):
             self.statement.result_scope['reinteract_output'](self)
 
     def create_widget(self):
-        c = self.canvas
+        c = self.canvas.switch_backends(FigureCanvas) #FigureCanvas(self) #self.canvas
         box = gtk.VBox()
         box.pack_start(c, True, True)
         toolbar = NavigationToolbar(c, None) # Last is supposed to be window?
