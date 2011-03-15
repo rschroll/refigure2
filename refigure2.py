@@ -288,8 +288,10 @@ def _make_func(name):
         SuperFigure.lock.acquire()
         try:
             if gcf() is None:
-                with figure():
+                with figure() as f:
                     pfunc(*args, **kw)
+                if _get_curr_statement() is None:
+                    return f
             else:
                 return pfunc(*args, **kw)
         finally:
