@@ -1,0 +1,35 @@
+# A patch to Reinteract allows extensions to manipulate the output
+# that goes into the worksheet.  refigure2 can take advantage of this
+# to eliminate a few annoyances.  For more details, see
+#     http://rschroll.github.com/refigure2/output.html
+# This worksheet will only work with a patched version of Reinteract.
+from refigure2 import *
+from numpy import *
+
+t = arange(0.0, 2.0, 0.01)
+s = sin(2*pi*t)
+
+# Compare this to the example in 1-Basics.  Note that the figure
+# object no longer need be named or returned at the end.
+with figure():
+    plot(t, s, linewidth=1.0)
+    xlabel('time (s)')
+    ylabel('voltage (mV)')
+    title('About as simple as it gets, folks')
+    grid(True)
+
+# Additionally, the return values from the various plotting commands
+# are not displayed.  They are still returned, so you may assign
+# them to variables.  Printing also still works.
+with figure() as f:
+    lines = plot(t, s)
+    print "I'm plotting", len(lines), "line on", f
+
+# If you would like to see the return values output to the worksheet,
+# simply pass the disable_output=False keyword pair to figure().
+with figure(disable_output=False):
+    plot(t, s, linewidth=1.0)
+    xlabel('time (s)')
+    ylabel('voltage (mV)')
+    title('About as simple as it gets, folks')
+    grid(True)

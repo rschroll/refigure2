@@ -38,13 +38,8 @@ with figure() as f:
     ax = f.add_subplot(111)
     ax.plot(t,s)
     f
-
-# The final line 'f' tells refigure to display the figure.  This
-# doesn't necessarily have to occur within the with block:
-with figure() as f:
-    plot(t, s, 'g:')
-print "I'll plot the figure with the next command."
-f
+# The final line 'f' tells refigure to display the figure.  See 
+# 4-Output for a way avoid this.
 
 # Any plotting command can be put into such a with block, not just
 # the pyplot commands.  If you have plotting functions defined in
