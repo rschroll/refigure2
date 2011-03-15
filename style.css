@@ -1,0 +1,87 @@
+body{
+    padding-left: 10em;
+    font-family: sans-serif;
+}
+
+dt{
+    float: left;
+    padding-right: 0.5ex;
+    font-style: italic;
+}
+
+h1{
+    font-size: 200%;
+    margin: 0.5em, 0em, 0.5em, 0em;
+}
+h1 span{
+    font-style: italic;
+    color: red;
+}
+
+h2{ font-size: 150%; }
+
+h3{
+    float: left;
+    font-size: 150%;
+    margin: 0em;
+    margin-top: -0.33em;
+    padding-right: 1ex;
+    font-weight: bold;
+}
+
+div{position: relative;}
+pre{
+    margin: 0 0 0 1ex;
+    padding-left: 3px;
+}
+pre:before{
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 1ex;
+    content: "";
+    background: blue;
+    border: 1px solid black;
+    height: 100%;
+}
+pre.output{
+    font-style: italic;
+}
+pre.output:before{
+    background: none;
+    border: none;
+}
+
+span.note{
+    position: absolute;
+    left: 35em;
+    font-style: normal;
+    font-weight: bold;
+    color: red;
+}
+
+code{ white-space: pre; }
+p.note{ font-size: smaller; }
+a.note{
+    vertical-align: super;
+    font-size: 0.75em;
+    line-height: 1em;
+}
+
+#contents{
+    position: fixed;
+    left: 1em;
+    top: 4em;
+    width: 8em;
+    padding-left: 0em;
+}
+#contents li{
+    list-style: none;
+    text-align: right;
+}
+
+div.new{
+    border: thick solid #999;
+    background: #efe0d0;
+    padding: 0em 1em;
+}

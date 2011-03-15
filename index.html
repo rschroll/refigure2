@@ -3,81 +3,7 @@
 <head>
 <title>refigure2</title>
 <meta charset="utf-8" />
-<style type="text/css">
-body{
-	padding-left: 10em;
-	font-family: sans-serif;
-}
-
-dt{
-	float: left;
-	padding-right: 0.5ex;
-	font-style: italic;
-}
-
-h1{
-	font-size: 200%;
-	margin: 0.5em, 0em, 0.5em, 0em;
-}
-h1 span{
-	font-style: italic;
-	color: red;
-}
-
-h2{ font-size: 150%; }
-
-h3{
-	float: left;
-	font-size: 150%;
-	margin: 0em;
-	margin-top: -0.33em;
-	padding-right: 1ex;
-	font-weight: bold;
-}
-
-div{position: relative;}
-pre{
-        margin: 0 0 0 1ex;
-        padding-left: 3px;
-}
-pre:before{
-        position: absolute;
-        left: 0;
-        top: -1px;
-        width: 1ex;
-        content: "";
-        background: blue;
-        border: 1px solid black;
-        height: 100%;
-}
-
-
-code{ white-space: pre; }
-p.note{ font-size: smaller; }
-a.note{
-	vertical-align: super;
-	font-size: 0.75em;
-	line-height: 1em;
-}
-
-#contents{
-	position: fixed;
-	left: 1em;
-	top: 4em;
-	width: 8em;
-	padding-left: 0em;
-}
-#contents li{
-	list-style: none;
-	text-align: right;
-}
-
-div.new{
-	border: thick solid #999;
-	background: #efe0d0;
-	padding: 0em 1em;
-}
-</style>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1><a id="top">refigure<span>2</span></a></h1>
@@ -97,6 +23,20 @@ matplotlib figures in Reinteract, but refigure2 has three notable features:</p>
 </ol>
 
 <h2><a id="news">What's New</a></h2>
+<h3>0.3</h3>
+<p>Several bug fixes and improvements:</p>
+<ul>
+<li>Fixed a bug in creating the solo functions, so that future versions of matplotlib will be handled more smoothly.</li>
+<li>The <a href="https://github.com/rschroll/refigure2/issues#issue/1">redraw bug</a> has been squashed, although <a href="https://bugzilla.gnome.org/show_bug.cgi?id=642527">another bug</a>, related to reference counting, was uncovered.</li>
+<li>Reinteract's printing mechanism is now supported, with three different printing methods:
+	<ul>
+	<li>When using the GTKCario backend, printing is done directly in Cairo.</li>
+	<li>Otherwise, if you have the Python Poppler bindings, printing is done through a PDF file, for full vector goodness.</li>
+	<li>As a last resort, printing is via a bitmap.  The resolution is taken from <code>rcParams['savefig.dpi']</code>, so bump that up to get good results.</li>
+	</ul></li>
+<li><em>refigure2</em> can take advantage of a patch to Reinteract to manipulate the output that goes into the worksheet.  <a href="output.html">More details.</a></li>
+</ul>
+
 <h3>0.2</h3>
 <p>The locking mechanism has been fixed.</p>
 

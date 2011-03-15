@@ -1,0 +1,67 @@
+From 603be09e856b5827f6ad54126b98cd0be2e4c9b4 Mon Sep 17 00:00:00 2001
+From: Owen W. Taylor <otaylor@fishsoup.net>
+Date: Sun, 19 Sep 2010 09:55:57 -0400
+Subject: [PATCH] Add Statement.get_current()
+
+Add a classmethod on the Statement class to get the currently
+executing statement.
+---
+ lib/reinteract/statement.py |   14 ++++++++++++++
+ 1 files changed, 14 insertions(+), 0 deletions(-)
+
+diff --git a/lib/reinteract/statement.py b/lib/reinteract/statement.py
+index 9ee52e8..5e5867b 100755
+--- a/lib/reinteract/statement.py
++++ b/lib/reinteract/statement.py
+@@ -8,6 +8,7 @@
+ 
+ import copy
+ import pkgutil
++import threading
+ import traceback
+ import sys
+ 
+@@ -38,6 +39,8 @@ class Statement:
+     EXECUTE_ERROR = 5
+     INTERRUPTED = 6
+ 
++    __local = threading.local()
++
+     def __init__(self, text, worksheet, parent=None):
+         self.__text = text
+         self.__worksheet = worksheet
+@@ -207,6 +210,7 @@ class Statement:
+         self.state = Statement.EXECUTING
+ 
+         self.__worksheet.global_scope['__reinteract_statement'] = self
++        Statement.__local.current = self
+         self.__capture = StdoutCapture(self.__stdout_write)
+         self.__capture.push()
+ 
+@@ -223,6 +227,7 @@ class Statement:
+             self.result_scope = None
+ 
+         self.__worksheet.global_scope['__reinteract_statement'] = None
++        Statement.__local.current = None
+         self.__stdout_buffer = None
+         self.__capture.pop()
+         self.__capture = None
+@@ -303,6 +308,15 @@ class Statement:
+         if self.state != Statement.NEW and self.state != Statement.COMPILE_ERROR:
+             self.state = Statement.COMPILE_SUCCESS
+ 
++    @classmethod
++    def get_current(self):
++        """Gets the currently executing statement, if any. If no statement is
++        currently executing, returns None."""
++        try:
++            return Statement.__local.current
++        except AttributeError, e:
++            return None
++
+ if __name__=='__main__':
+     import stdout_capture
+     from notebook import Notebook
+-- 
+1.7.2.1
+
