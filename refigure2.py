@@ -1,5 +1,5 @@
 # Copyright 2009--2010 Robert Schroll, rschroll@gmail.com
-# http://jfi.uchicago.edu/~rschroll/refigure/
+# http://rschroll.github.com/refigure2/
 #
 # This file is distributed under the terms of the BSD license, available
 # at http://www.opensource.org/licenses/bsd-license.php
@@ -25,7 +25,7 @@ worksheets.  Syntax:
 where <plotting command> is any matplotlib command.  The single-command 
 plotting functions may be used without the with block.
 """
-__version__ = "0.2"
+__version__ = "0.3"
 
 import os
 import tempfile
@@ -66,7 +66,7 @@ your matplotlibrc file, or before importing refigure run
     >>> from matplotlib import use
     >>> use( < 'GTK' | 'GTKAgg' | 'GTKCairo' > )
 """
-    
+
 _gui_elements = ['FigureCanvas'+_backend, 'NavigationToolbar2'+_backend]
 if _backend == 'GTKCairo':
     _gui_elements[1] = 'NavigationToolbar2GTK'
@@ -80,7 +80,7 @@ _temp = __import__('matplotlib.backends.backend_' + _backend.lower(),
                     globals(), locals(), _gui_elements)
 FigureCanvas = getattr(_temp, _gui_elements[0])
 NavigationToolbar = getattr(_temp, _gui_elements[1])
-del(_gui_elements, _temp) #, FigureCanvas, NavigationToolbar)
+del(_gui_elements, _temp)
 
 # SuperFigure inherits from Figure, so it can be used like a matplotlib figure.
 # It inherits from CustomResult, so it can embed the figure.  And it has
@@ -206,7 +206,7 @@ class SuperFigure(Figure, custom_result.CustomResult):
                 r,w = os.pipe()
                 rf = os.fdopen(r, 'r')
                 wf = os.fdopen(w, 'w')
-                self.savefig(wf, format='png') #, dpi=context.get_dpi_x())
+                self.savefig(wf, format='png')
                 wf.close()
                 image = cairo.ImageSurface.create_from_png(rf)
                 rf.close()
