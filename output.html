@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>refigure2</title>
+<title>refigure2 - Output Manipulation</title>
 <meta charset="utf-8" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <h1><a id="top">refigure<span>2</span></a> &mdash; Output Manipulation</h1>
 
-<p>A patch to Reinteract allows extensions to manipulate the output that goes to the notebook.  <em>refigure2</em> can take advantage of this ability to solve two annoyances.</p>
+<p>A patch to Reinteract allows extensions to manipulate the output that goes to the notebook.  refigure2 can take advantage of this ability to solve two annoyances.</p>
 
 <h2><a id="problem">The Problem</a></h2>
-<p>This example illustrates two annoyances in the design of <em>refigure2</em>.</p>
+<p>This example illustrates two annoyances in the design of refigure2.</p>
 <div><pre>with figure() as f:<span class="note">1</span>
     plot([1,2,1])
     f<span class="note">1</span>
@@ -20,15 +20,15 @@
 <img src="plottri.png" height="399" width="480" alt="" />
 </pre></div>
 <ol>
-<li>The figure must be named at the beginning of the with block and then called at the end, in order to have the figure actually display.  It would be better for <em>refigure2</em> to make that happen automatically.</li>
+<li>The figure must be named at the beginning of the with block and then called at the end, in order to have the figure actually display.  It would be better for refigure2 to make that happen automatically.</li>
 <li>The plotting commands return the objects that were plotted.  This output is printed, but is generally not useful.</li>
 </ol>
 
 <h2><a id="patch">The Patch</a></h2>
-<p>Both of these problems could be fixed if extensions could manipulate the output that goes to Reinteract.  To allow this, Owen Taylor wrote <a href="0001-Add-Statement.get_current.patch">this patch</a> for Reinteract.  It has yet to be added to the trunk, so you will have to apply it yourself to get the new behavior.  (If you're using git, you'll need the <code>git am</code> command.)  This isn't necessary &mdash; <em>refigure2</em> will continue to work with the stock Reinteract.  But you'll need it to get the following behavior.</p>
+<p>Both of these problems could be fixed if extensions could manipulate the output that goes to Reinteract.  To allow this, Owen Taylor wrote <a href="0001-Add-Statement.get_current.patch">this patch</a> for Reinteract.  It has yet to be added to the trunk, so you will have to apply it yourself to get the new behavior.  (If you're using git, you'll need the <code>git am</code> command.)  This isn't necessary &mdash; refigure2 will continue to work with the stock Reinteract.  But you'll need it to get the following behavior.</p>
 
 <h2><a id="solution">The Solution</a></h2>
-<p>When the patch is applied, <em>refigure2</em> does two things differently:</p>
+<p>When the patch is applied, refigure2 does two things differently:</p>
 <ol>
 <li>The figure is automatically output into the notebook at the end of a with block.</li>
 <li>Return values from commands in the with block will no longer be output to the worksheet.  Note that <code>print</code> statements still work.</li>
@@ -42,7 +42,7 @@
 </pre></div>
 <p>This second feature only disables the <em>display</em> of the return values; the plot commands still return the same values, so you can still do <code>lines = plot(...)</code>.  If you wish to re-enable the display of these values, pass the <code>disable_output=False</code> keyword pair to <code>figure()</code>.</p>
 
-<p>These two changes together ensure that old code will still work with the new version of <em>refigure2</em>.  The call of the figure object won't produce output anymore, but the with block will output the figure instead.  If you use <code>disable_output=False</code> with old code, however, you may end up with two figure widgets output at the same time.  So don't do that!</p>
+<p>These two changes together ensure that old code will still work with the new version of refigure2.  The call of the figure object won't produce output anymore, but the with block will output the figure instead.  If you use <code>disable_output=False</code> with old code, however, you may end up with two figure widgets output at the same time.  So don't do that!</p>
 
 <ul id="contents">
 <li><a href="#top">Top</a></li>
