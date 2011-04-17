@@ -46,10 +46,28 @@ if hasattr(Statement, 'get_current'):
 else:
     _get_curr_statement = lambda: None
 
-# Set up backend and adjust a few defaults.
+# Adjust a few defaults
+_p.rcParams.validate.update({'refigure.printdpi': _p.matplotlib.rcsetup.validate_float,
+                             'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
+                            })
 _p.rcParams.update({'figure.figsize': [6.0, 4.5],
-                   'figure.subplot.bottom': 0.12,
+                    'figure.subplot.bottom': 0.12,
+                    'refigure.printdpi': 300,
+                    'refigure.disableoutput': False,
                    })
+for filename in (os.path.join(os.path.dirname(__file__), 'refigurerc'),):
+    if os.path.exists(filename):
+        for line in file(filename, 'r'):
+            stripline = line.split('#', 1)[0].strip()
+            if not stripline:
+                continue
+            key, val = [s.strip() for s in stripline.split(':', 1)]
+            try:
+                _p.rcParams[key] = val
+            except Exception, msg:
+                print "Warning: Bad value for %s: %s"%(key, val)
+
+# Set up backend
 _backend = _p.get_backend()
 if not _backend.startswith('GTK'):
     if _p.rcParams['backend_fallback']:
@@ -99,10 +117,13 @@ class SuperFigure(Figure, custom_result.CustomResult):
     lock = RLock()
     current_fig = None
     
-    def __init__(self, locking=True, disable_output=True, **figkw):
+    def __init__(self, locking=True, disable_output=None, **figkw):
         Figure.__init__(self, **figkw)
         c = FigureCanvasBase(self) # For savefig to work
-        self._disable_output = disable_output
+        if disable_output is not None:
+            self._disable_output = disable_output
+        else:
+            self._disable_output = _p.rcParams['refigure.disableoutput']
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
             self.__class__.current_fig = self # Another thread can tweak this!
@@ -206,12 +227,13 @@ class SuperFigure(Figure, custom_result.CustomResult):
                 r,w = os.pipe()
                 rf = os.fdopen(r, 'r')
                 wf = os.fdopen(w, 'w')
-                self.savefig(wf, format='png')
+                dpi = _p.rcParams['refigure.printdpi']
+                self.savefig(wf, format='png', dpi=dpi)
                 wf.close()
                 image = cairo.ImageSurface.create_from_png(rf)
                 rf.close()
 
-                sf = cdpi/_p.rcParams['savefig.dpi']
+                sf = cdpi/dpi
                 cr.scale(sf, sf)
                 cr.set_source_surface(image, 0, 0)
                 cr.paint()
