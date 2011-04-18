@@ -27,84 +27,97 @@ plotting functions may be used without the with block.
 """
 __version__ = "0.3"
 
-import os
-import tempfile
-import gtk
-import cairo
+import os as _os
+import tempfile as _tempfile
+import gtk as _gtk
+import cairo as _cairo
 # Monkey patch gtk to keep matplotlib from setting the window icon.
 # This can't be an intelligent thing to do....
-gtk.window_set_default_icon_from_file = lambda x: None
+_gtk.window_set_default_icon_from_file = lambda x: None
 
 import matplotlib.pyplot as _p
-from matplotlib.figure import Figure
-from matplotlib.backend_bases import FigureCanvasBase
-import reinteract.custom_result as custom_result
-from threading import RLock
-from reinteract.statement import Statement
-if hasattr(Statement, 'get_current'):
-    _get_curr_statement = lambda: Statement.get_current()
+from matplotlib.figure import Figure as _Figure
+from matplotlib.backend_bases import FigureCanvasBase as _FigureCanvasBase
+import reinteract.custom_result as _custom_result
+from threading import RLock as _RLock
+from reinteract.statement import Statement as _Statement
+if hasattr(_Statement, 'get_current'):
+    _get_curr_statement = lambda: _Statement.get_current()
 else:
     _get_curr_statement = lambda: None
 
-# Adjust a few defaults
-_p.rcParams.validate.update({'refigure.printdpi': _p.matplotlib.rcsetup.validate_float,
-                             'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
-                            })
-_p.rcParams.update({'figure.figsize': [6.0, 4.5],
-                    'figure.subplot.bottom': 0.12,
-                    'refigure.printdpi': 300,
-                    'refigure.disableoutput': False,
-                   })
-for filename in (os.path.join(os.path.dirname(__file__), 'refigurerc'),):
-    if os.path.exists(filename):
-        for line in file(filename, 'r'):
-            stripline = line.split('#', 1)[0].strip()
-            if not stripline:
-                continue
-            key, val = [s.strip() for s in stripline.split(':', 1)]
-            try:
-                _p.rcParams[key] = val
-            except Exception, msg:
-                print "Warning: Bad value for %s: %s"%(key, val)
+def _set_rcParams():
+    """Add new values to rcParams and read in values from refigurerc file(s)."""
+    
+    _p.rcParams.validate.update({'refigure.printdpi': _p.matplotlib.rcsetup.validate_float,
+                                 'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
+                                })
+    _p.rcParams.update({'figure.figsize': [6.0, 4.5],
+                        'figure.subplot.bottom': 0.12,
+                        'refigure.printdpi': 300,
+                        'refigure.disableoutput': False,
+                       })
+    
+    paths = ((_os.path.dirname(__file__), 'refigurerc'),
+             ('~', '.matplotlib', 'refigurerc'))
+    statement = _get_curr_statement()
+    if statement is not None:
+        paths += ((statement._Statement__worksheet.notebook.folder, 'refigurerc'),)
+    for filename in (_os.path.join(*p) for p in paths):
+        if _os.path.exists(filename):
+            for line in file(filename, 'r'):
+                stripline = line.split('#', 1)[0].strip()
+                if not stripline:
+                    continue
+                key, val = [s.strip() for s in stripline.split(':', 1)]
+                try:
+                    _p.rcParams[key] = val
+                except Exception, msg:
+                    print "Warning: Bad value for %s: %s"%(key, val)
+_set_rcParams()
 
-# Set up backend
-_backend = _p.get_backend()
-if not _backend.startswith('GTK'):
-    if _p.rcParams['backend_fallback']:
-        if _backend.endswith('Agg'):
-            _backend = 'GTKAgg'
-        elif _backend.endswith('Cairo'):
-            _backend = 'GTKCairo'
+def _set_backend():
+    """Choose the backend and get the GUI elements needed for it."""
+    backend = _p.get_backend()
+    if not backend.startswith('GTK'):
+        if _p.rcParams['backend_fallback']:
+            if backend.endswith('Agg'):
+                backend = 'GTKAgg'
+            elif backend.endswith('Cairo'):
+                backend = 'GTKCairo'
+            else:
+                backend = 'GTK'
         else:
-            _backend = 'GTK'
-    else:
-        raise NotImplementedError, """
-You must use a GTK-based backend with refigure.  Adjust
-your matplotlibrc file, or before importing refigure run
-    >>> from matplotlib import use
-    >>> use( < 'GTK' | 'GTKAgg' | 'GTKCairo' > )
-"""
+            raise NotImplementedError, """
+    You must use a GTK-based backend with refigure.  Adjust
+    your matplotlibrc file, or before importing refigure run
+        >>> from matplotlib import use
+        >>> use( < 'GTK' | 'GTKAgg' | 'GTKCairo' > )
+    """
+    
+    gui_elements = ['FigureCanvas'+backend, 'NavigationToolbar2'+backend]
+    if backend == 'GTKCairo':
+        gui_elements[1] = 'NavigationToolbar2GTK'
+    temp = __import__('matplotlib.backends.backend_' + backend.lower(),
+                      globals(), locals(), gui_elements)
+    canvas = getattr(temp, gui_elements[0])
+    toolbar = getattr(temp, gui_elements[1])
+    return backend, canvas, toolbar
+_backend, _FigureCanvas, _NavigationToolbar = _set_backend()
 
-_gui_elements = ['FigureCanvas'+_backend, 'NavigationToolbar2'+_backend]
 if _backend == 'GTKCairo':
-    _gui_elements[1] = 'NavigationToolbar2GTK'
     from matplotlib.backends.backend_cairo import RendererCairo
 else:
     try:
-        import poppler
+        import poppler as _poppler
     except ImportError:
-        poppler = None
-_temp = __import__('matplotlib.backends.backend_' + _backend.lower(),
-                    globals(), locals(), _gui_elements)
-FigureCanvas = getattr(_temp, _gui_elements[0])
-NavigationToolbar = getattr(_temp, _gui_elements[1])
-del(_gui_elements, _temp)
+        _poppler = None
 
 # SuperFigure inherits from Figure, so it can be used like a matplotlib figure.
 # It inherits from CustomResult, so it can embed the figure.  And it has
 # __enter__ and __exit__ methods, so it can be used in a with statement.  How's
 # that for super?
-class SuperFigure(Figure, custom_result.CustomResult):
+class SuperFigure(_Figure, _custom_result.CustomResult):
     """Create a new figure.  figure() is designed to be used with a with
     block; the __enter__ method also returns the figure instance.  Thus
         
@@ -114,12 +127,12 @@ class SuperFigure(Figure, custom_result.CustomResult):
     
     Takes the same optional keywords as matplotlib's figure()."""
     
-    lock = RLock()
+    lock = _RLock()
     current_fig = None
     
     def __init__(self, locking=True, disable_output=None, **figkw):
-        Figure.__init__(self, **figkw)
-        c = FigureCanvasBase(self) # For savefig to work
+        _Figure.__init__(self, **figkw)
+        c = _FigureCanvasBase(self) # For savefig to work
         if disable_output is not None:
             self._disable_output = disable_output
         else:
@@ -161,17 +174,17 @@ class SuperFigure(Figure, custom_result.CustomResult):
             self.statement.result_scope['reinteract_output'](self)
 
     def create_widget(self):
-        c = self.canvas.switch_backends(FigureCanvas) #FigureCanvas(self) #self.canvas
-        box = gtk.VBox()
+        c = self.canvas.switch_backends(_FigureCanvas) #FigureCanvas(self) #self.canvas
+        box = _gtk.VBox()
         box.pack_start(c, True, True)
-        toolbar = NavigationToolbar(c, None) # Last is supposed to be window?
-        e = gtk.EventBox() # For setting cursor
+        toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
+        e = _gtk.EventBox() # For setting cursor
         e.add(toolbar)
         box.pack_end(e, False, False)
         c.set_size_request(*map(int, self.get_size_inches()*self.get_dpi()))
         box.show_all()
         toolbar.connect("realize", lambda widget:
-            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR)))
+            widget.window.set_cursor(_gtk.gdk.Cursor(_gtk.gdk.LEFT_PTR)))
         return box
     
     def print_result(self, context, render):
@@ -192,7 +205,7 @@ class SuperFigure(Figure, custom_result.CustomResult):
                 # it associated with a file, so pass None as first argument.
                 # Except that also doesn't work.  So give it a tempfile that
                 # will be destroyed as soon as it is closed.
-                surf = cairo.PDFSurface(tempfile.TemporaryFile(), width, height)
+                surf = _cairo.PDFSurface(_tempfile.TemporaryFile(), width, height)
                 renderer.set_ctx_from_surface(surf)
 
                 # From backend_bases.FigureCanvasBase.print_figure()
@@ -213,24 +226,24 @@ class SuperFigure(Figure, custom_result.CustomResult):
                 cr.paint()
                 surf.finish()
 
-            elif poppler is not None:
+            elif _poppler is not None:
                 # savefig with PDFs doesn't like pipes.
-                fd, fn = tempfile.mkstemp()
-                os.close(fd)
+                fd, fn = _tempfile.mkstemp()
+                _os.close(fd)
                 self.savefig(fn, format='pdf')
-                page = poppler.document_new_from_file('file://' + fn, None).get_page(0)
-                os.unlink(fn)
+                page = _poppler.document_new_from_file('file://' + fn, None).get_page(0)
+                _os.unlink(fn)
                 
                 page.render(cr)
 
             else:
-                r,w = os.pipe()
-                rf = os.fdopen(r, 'r')
-                wf = os.fdopen(w, 'w')
+                r,w = _os.pipe()
+                rf = _os.fdopen(r, 'r')
+                wf = _os.fdopen(w, 'w')
                 dpi = _p.rcParams['refigure.printdpi']
                 self.savefig(wf, format='png', dpi=dpi)
                 wf.close()
-                image = cairo.ImageSurface.create_from_png(rf)
+                image = _cairo.ImageSurface.create_from_png(rf)
                 rf.close()
 
                 sf = cdpi/dpi
