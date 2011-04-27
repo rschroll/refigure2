@@ -1,4 +1,4 @@
-# Copyright 2009--2010 Robert Schroll, rschroll@gmail.com
+# Copyright 2009--2011 Robert Schroll, rschroll@gmail.com
 # http://rschroll.github.com/refigure2/
 #
 # This file is distributed under the terms of the BSD license, available
@@ -59,7 +59,7 @@ def _set_rcParams():
                        })
     
     paths = ((_os.path.dirname(__file__), 'refigurerc'),
-             ('~', '.matplotlib', 'refigurerc'))
+             (_os.path.expanduser('~'), '.matplotlib', 'refigurerc'))
     statement = _get_curr_statement()
     if statement is not None:
         paths += ((statement._Statement__worksheet.notebook.folder, 'refigurerc'),)
@@ -106,7 +106,7 @@ def _set_backend():
 _backend, _FigureCanvas, _NavigationToolbar = _set_backend()
 
 if _backend == 'GTKCairo':
-    from matplotlib.backends.backend_cairo import RendererCairo
+    from matplotlib.backends.backend_cairo import RendererCairo as _RendererCairo
 else:
     try:
         import poppler as _poppler
@@ -196,7 +196,7 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
 
         if render:
             if _backend == "GTKCairo":
-                renderer = RendererCairo(self.dpi)
+                renderer = _RendererCairo(self.dpi)
                 renderer.set_width_height(width, height)
                 # Want to create surface similar to eventual target,
                 # but that doesn't work with a PDFSurface....
