@@ -227,7 +227,6 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
                 surf.finish()
 
             elif _poppler is not None:
-                # savefig with PDFs doesn't like pipes.
                 fd, fn = _tempfile.mkstemp()
                 _os.close(fd)
                 self.savefig(fn, format='pdf')
@@ -237,14 +236,12 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
                 page.render(cr)
 
             else:
-                r,w = _os.pipe()
-                rf = _os.fdopen(r, 'r')
-                wf = _os.fdopen(w, 'w')
+                fd, fn = _tempfile.mkstemp()
+                _os.close(fd)
                 dpi = _p.rcParams['refigure.printdpi']
-                self.savefig(wf, format='png', dpi=dpi)
-                wf.close()
-                image = _cairo.ImageSurface.create_from_png(rf)
-                rf.close()
+                self.savefig(fn, format='png', dpi=dpi)
+                image = _cairo.ImageSurface.create_from_png(fn)
+                _os.unlink(fn)
 
                 sf = cdpi/dpi
                 cr.scale(sf, sf)
