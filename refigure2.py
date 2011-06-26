@@ -13,7 +13,7 @@
 # Thanks to Kai Willadsen for rematplotlib:
 # http://ramshacklecode.googlepages.com/#rematplotlib
 
-"""refigure2 is an extension for Reinteract that embeds matplotlib figures in 
+"""refigure2 is an extension for Reinteract that embeds matplotlib figures in
 worksheets.  Syntax:
     
     >>> with figure() as f
@@ -22,10 +22,10 @@ worksheets.  Syntax:
     ...     <plotting command>
     ...     f
 
-where <plotting command> is any matplotlib command.  The single-command 
+where <plotting command> is any matplotlib command.  The single-command
 plotting functions may be used without the with block.
 """
-__version__ = "0.3"
+__version__ = "0.4"
 
 import os as _os
 import tempfile as _tempfile
@@ -294,7 +294,7 @@ class setOnceDict(dict):
 
 def rclocal(group, **kwargs):
     """Adjust the rcParams object for only this plot.  Takes arguments either in
-    the style of rc() (a group string followed by keyword pairs) or of 
+    the style of rc() (a group string followed by keyword pairs) or of
     rcParams.update() (a dictionary)."""
     if isinstance(group, basestring):
         kw = {}
