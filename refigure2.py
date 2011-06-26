@@ -72,8 +72,11 @@ def _set_rcParams():
                 key, val = [s.strip() for s in stripline.split(':', 1)]
                 try:
                     _p.rcParams[key] = val
-                except Exception, msg:
-                    print "Warning: Bad value for %s: %s"%(key, val)
+                except KeyError:
+                    print "Warning: Invalid key %s in %s"%(key, filename)
+                    print "         See rcParams.keys() for a list of valid keys."
+                except Exception:
+                    print "Warning: Bad value for %s: %s\n         in %s"%(key, val, filename)
 _set_rcParams()
 
 def _set_backend():
