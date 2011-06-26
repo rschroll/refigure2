@@ -51,11 +51,13 @@ def _set_rcParams():
     
     _p.rcParams.validate.update({'refigure.printdpi': _p.matplotlib.rcsetup.validate_float,
                                  'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
+                                 'refigure.keyboardcontrol': _p.matplotlib.rcsetup.validate_bool,
                                 })
     _p.rcParams.update({'figure.figsize': [6.0, 4.5],
                         'figure.subplot.bottom': 0.12,
                         'refigure.printdpi': 300,
                         'refigure.disableoutput': False,
+                        'refigure.keyboardcontrol': True,
                        })
     
     paths = ((_os.path.dirname(__file__), 'refigurerc'),
@@ -105,8 +107,10 @@ def _set_backend():
                       globals(), locals(), gui_elements)
     canvas = getattr(temp, gui_elements[0])
     toolbar = getattr(temp, gui_elements[1])
-    return backend, canvas, toolbar
-_backend, _FigureCanvas, _NavigationToolbar = _set_backend()
+    temp = __import__('matplotlib.backend_bases', globals(), locals(), ['FigureManagerBase'])
+    figmanager = getattr(temp, 'FigureManagerBase')
+    return backend, canvas, toolbar, figmanager
+_backend, _FigureCanvas, _NavigationToolbar, _FigureManager = _set_backend()
 
 if _backend == 'GTKCairo':
     from matplotlib.backends.backend_cairo import RendererCairo as _RendererCairo
@@ -186,6 +190,17 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
         box.pack_end(e, False, False)
         c.set_size_request(*map(int, self.get_size_inches()*self.get_dpi()))
         box.show_all()
+        
+        if _p.rcParams['refigure.keyboardcontrol']:
+            # Create a FigureManager for the canvas to handle key_press_events
+            _FigureManager(c, 0)
+            # On click, grab the focus.  Return True so that event doesn't bubble up to the
+            # TextView, which would grab focus right back.
+            c.connect("button_press_event", lambda widget, event: widget.grab_focus() or True)
+            # Key presses are handled by the canvas already, but need to return True so that
+            # event doesn't bubble up to the TextView and cause it to insert a character.
+            c.connect("key_press_event", lambda widget, event: True)
+        
         toolbar.connect("realize", lambda widget:
             widget.window.set_cursor(_gtk.gdk.Cursor(_gtk.gdk.LEFT_PTR)))
         return box
