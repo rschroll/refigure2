@@ -41,10 +41,6 @@ from matplotlib.backend_bases import FigureCanvasBase as _FigureCanvasBase
 import reinteract.custom_result as _custom_result
 from threading import RLock as _RLock
 from reinteract.statement import Statement as _Statement
-if hasattr(_Statement, 'get_current'):
-    _get_curr_statement = lambda: _Statement.get_current()
-else:
-    _get_curr_statement = lambda: None
 
 def _set_rcParams():
     """Add new values to rcParams and read in values from refigurerc file(s)."""
@@ -62,7 +58,7 @@ def _set_rcParams():
     
     paths = ((_os.path.dirname(__file__), 'refigurerc'),
              (_os.path.expanduser('~'), '.matplotlib', 'refigurerc'))
-    statement = _get_curr_statement()
+    statement = _Statement.get_current()
     if statement is not None:
         paths += ((statement._Statement__worksheet.notebook.folder, 'refigurerc'),)
     for filename in (_os.path.join(*p) for p in paths):
@@ -165,7 +161,7 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
         self.__class__.lock.release()
     
     def _disable_reinteract_output(self):
-        self.statement = _get_curr_statement()
+        self.statement = _Statement.get_current()
         if self.statement is not None:
             self.old_reinteract_output = self.statement.result_scope['reinteract_output']
             if self._disable_output:
