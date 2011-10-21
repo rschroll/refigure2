@@ -162,7 +162,6 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
         self.__class__.current_fig = None
         _p.rcParams.update(self.prev_rc)
         self._restore_reinteract_output()
-        self._output_figure()
         self.__class__.lock.release()
     
     def _disable_reinteract_output(self):
@@ -175,10 +174,6 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     def _restore_reinteract_output(self):
         if self.statement is not None:
             self.statement.result_scope['reinteract_output'] = self.old_reinteract_output
-    
-    def _output_figure(self):
-        if self.statement is not None:
-            self.statement.result_scope['reinteract_output'](self)
 
     def create_widget(self):
         c = self.canvas.switch_backends(_FigureCanvas) #FigureCanvas(self) #self.canvas
@@ -340,8 +335,7 @@ def _make_func(name):
             if gcf() is None:
                 with figure() as f:
                     pfunc(*args, **kw)
-                if _get_curr_statement() is None:
-                    return f
+                return f
             else:
                 return pfunc(*args, **kw)
         finally:
