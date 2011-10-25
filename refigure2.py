@@ -48,12 +48,14 @@ def _set_rcParams():
     _p.rcParams.validate.update({'refigure.printdpi': _p.matplotlib.rcsetup.validate_float,
                                  'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
                                  'refigure.keyboardcontrol': _p.matplotlib.rcsetup.validate_bool,
+                                 'refigure.display': _p.matplotlib.rcsetup.ValidateInStrings('refigure.display', ['inline', 'side']),
                                 })
     _p.rcParams.update({'figure.figsize': [6.0, 4.5],
                         'figure.subplot.bottom': 0.12,
                         'refigure.printdpi': 300,
                         'refigure.disableoutput': False,
                         'refigure.keyboardcontrol': True,
+                        'refigure.display': 'inline',
                        })
     
     paths = ((_os.path.dirname(__file__), 'refigurerc'),
@@ -133,13 +135,17 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     lock = _RLock()
     current_fig = None
     
-    def __init__(self, locking=True, disable_output=None, **figkw):
+    def __init__(self, locking=True, disable_output=None, display=None, **figkw):
         _Figure.__init__(self, **figkw)
         c = _FigureCanvasBase(self) # For savefig to work
         if disable_output is not None:
             self._disable_output = disable_output
         else:
             self._disable_output = _p.rcParams['refigure.disableoutput']
+        if display is not None:
+            self.display = display
+        else:
+            self.display = _p.rcParams['refigure.display']
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
             self.__class__.current_fig = self # Another thread can tweak this!
