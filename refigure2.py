@@ -38,6 +38,7 @@ _gtk.window_set_default_icon_from_file = lambda x: None
 import matplotlib.pyplot as _p
 from matplotlib.figure import Figure as _Figure
 from matplotlib.backend_bases import FigureCanvasBase as _FigureCanvasBase
+from matplotlib.backend_bases import FigureManagerBase as _FigureManager
 import reinteract.custom_result as _custom_result
 from threading import RLock as _RLock
 from reinteract.statement import Statement as _Statement
@@ -105,10 +106,8 @@ def _set_backend():
                       globals(), locals(), gui_elements)
     canvas = getattr(temp, gui_elements[0])
     toolbar = getattr(temp, gui_elements[1])
-    temp = __import__('matplotlib.backend_bases', globals(), locals(), ['FigureManagerBase'])
-    figmanager = getattr(temp, 'FigureManagerBase')
-    return backend, canvas, toolbar, figmanager
-_backend, _FigureCanvas, _NavigationToolbar, _FigureManager = _set_backend()
+    return backend, canvas, toolbar
+_backend, _FigureCanvas, _NavigationToolbar = _set_backend()
 
 if _backend == 'GTKCairo':
     from matplotlib.backends.backend_cairo import RendererCairo as _RendererCairo
