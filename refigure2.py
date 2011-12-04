@@ -117,6 +117,21 @@ else:
     except ImportError:
         _poppler = None
 
+class _ResizeBox(_gtk.VBox):
+    
+    def __init__(self, figure):
+        _gtk.VBox.__init__(self)
+        self.figure = figure
+        # Rounding errors slowly accumlate in the figure height, shrinking it down
+        # over time.  So we make a copy here and use that to keep resetting the
+        # canvas to the proper size.
+        self.figsize_inches = self.figure.get_size_inches().copy()
+    
+    def set_sidebar_width(self, width):
+        dpi = width / self.figsize_inches[0]
+        self.figure.set_dpi(dpi)
+        self.figure.canvas.set_size_request(*map(int, self.figsize_inches * dpi))
+
 # SuperFigure inherits from Figure, so it can be used like a matplotlib figure.
 # It inherits from CustomResult, so it can embed the figure.  And it has
 # __enter__ and __exit__ methods, so it can be used in a with statement.  How's
@@ -178,7 +193,10 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
 
     def create_widget(self):
         c = self.canvas.switch_backends(_FigureCanvas) #FigureCanvas(self) #self.canvas
-        box = _gtk.VBox()
+        if self.display == 'side':
+            box = _ResizeBox(self)
+        else:
+            box = _gtk.VBox()
         box.pack_start(c, True, True)
         toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
         e = _gtk.EventBox() # For setting cursor
