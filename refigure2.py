@@ -192,7 +192,14 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
             self.statement.result_scope['reinteract_output'] = self.old_reinteract_output
 
     def create_widget(self):
-        c = self.canvas.switch_backends(_FigureCanvas) #FigureCanvas(self) #self.canvas
+        c = self.canvas.switch_backends(_FigureCanvas)
+        # Axes3D need the mouse events hooked back up after getting a new canvas.
+        for ax in self.axes:
+            try:
+                ax.mouse_init(ax._rotate_btn, ax._zoom_btn)
+            except AttributeError:
+                pass
+        
         if self.display == 'side':
             box = _ResizeBox(self)
         else:
