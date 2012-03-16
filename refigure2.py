@@ -50,6 +50,7 @@ def _set_rcParams():
                                  'refigure.disableoutput': _p.matplotlib.rcsetup.validate_bool,
                                  'refigure.keyboardcontrol': _p.matplotlib.rcsetup.validate_bool,
                                  'refigure.display': _p.matplotlib.rcsetup.ValidateInStrings('refigure.display', ['inline', 'side']),
+                                 'refigure.toolbar': _p.matplotlib.rcsetup.validate_bool,
                                 })
     _p.rcParams.update({'figure.figsize': [6.0, 4.5],
                         'figure.subplot.bottom': 0.12,
@@ -57,6 +58,7 @@ def _set_rcParams():
                         'refigure.disableoutput': False,
                         'refigure.keyboardcontrol': True,
                         'refigure.display': 'inline',
+                        'refigure.toolbar': True,
                        })
     
     paths = ((_os.path.dirname(__file__), 'refigurerc'),
@@ -149,7 +151,7 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     lock = _RLock()
     current_fig = None
     
-    def __init__(self, locking=True, disable_output=None, display=None, **figkw):
+    def __init__(self, locking=True, disable_output=None, display=None, toolbar=None, **figkw):
         _Figure.__init__(self, **figkw)
         c = _FigureCanvasBase(self) # For savefig to work
         if disable_output is not None:
@@ -160,6 +162,10 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
             self.display = display
         else:
             self.display = _p.rcParams['refigure.display']
+        if toolbar is not None:
+            self._toolbar = toolbar
+        else:
+            self._toolbar = _p.rcParams['refigure.toolbar']
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
             self.__class__.current_fig = self # Another thread can tweak this!
@@ -205,12 +211,15 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
         else:
             box = _gtk.VBox()
         box.pack_start(c, True, True)
-        toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
-        e = _gtk.EventBox() # For setting cursor
-        e.add(toolbar)
-        box.pack_end(e, False, False)
         c.set_size_request(*map(int, self.get_size_inches()*self.get_dpi()))
-        box.show_all()
+        
+        if self._toolbar:
+            toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
+            e = _gtk.EventBox() # For setting cursor
+            e.add(toolbar)
+            box.pack_end(e, False, False)
+            toolbar.connect("realize", lambda widget:
+                widget.window.set_cursor(_gtk.gdk.Cursor(_gtk.gdk.LEFT_PTR)))
         
         if _p.rcParams['refigure.keyboardcontrol']:
             # Create a FigureManager for the canvas to handle key_press_events
@@ -222,8 +231,7 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
             # event doesn't bubble up to the TextView and cause it to insert a character.
             c.connect("key_press_event", lambda widget, event: True)
         
-        toolbar.connect("realize", lambda widget:
-            widget.window.set_cursor(_gtk.gdk.Cursor(_gtk.gdk.LEFT_PTR)))
+        box.show_all()
         return box
     
     def print_result(self, context, render):
