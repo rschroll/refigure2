@@ -152,8 +152,6 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     current_fig = None
     
     def __init__(self, locking=True, disable_output=None, display=None, toolbar=None, **figkw):
-        _Figure.__init__(self, **figkw)
-        c = _FigureCanvasBase(self) # For savefig to work
         if disable_output is not None:
             self._disable_output = disable_output
         else:
@@ -166,6 +164,11 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
             self._toolbar = toolbar
         else:
             self._toolbar = _p.rcParams['refigure.toolbar']
+        if not self._toolbar and 'facecolor' not in figkw:
+            figkw['facecolor'] = 'white'
+        
+        _Figure.__init__(self, **figkw)
+        c = _FigureCanvasBase(self) # For savefig to work
         # Set this here to allow 'f = figure()'  syntax
         if not locking:
             self.__class__.current_fig = self # Another thread can tweak this!
