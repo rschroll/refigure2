@@ -239,7 +239,7 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     
     def print_result(self, context, render):
         cr = context.get_cairo_context()
-        cdpi = context.get_dpi_x()
+        cdpi = 72.0
         width, height = self.get_size_inches()
         width *= cdpi
         height *= cdpi
