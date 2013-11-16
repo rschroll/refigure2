@@ -199,6 +199,42 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
     def _restore_reinteract_output(self):
         if self.statement is not None:
             self.statement.result_scope['reinteract_output'] = self.old_reinteract_output
+            
+    def _button_press_event(self, widget, event):
+        if not self._toolbar and event.button == 3:
+            # Release previous mode.
+            if self.toolbar._active == 'PAN':
+                self.toolbar.release_pan(event)
+            elif self.toolbar._active == 'ZOOM':
+                self.toolbar.release_zoom(event)
+            
+            # Pop up context menu.
+            menu = _gtk.Menu()
+            for toolitem in self.toolbar.toolitems:
+                if toolitem[0] != None:
+                    if toolitem[3] == 'pan':
+                        menu_item = _gtk.CheckMenuItem(toolitem[0])
+                        menu_item.set_active(self.toolbar.mode == 'pan/zoom')
+                    elif toolitem[3] == 'zoom':
+                        menu_item = _gtk.CheckMenuItem(toolitem[0])
+                        menu_item.set_active(self.toolbar.mode == 'zoom rect')
+                    else:
+                        menu_item = _gtk.MenuItem(toolitem[0])
+                    menu_item.connect("activate", getattr(self.toolbar, toolitem[3]))
+                else:
+                    menu_item = _gtk.SeparatorMenuItem()
+                menu.append(menu_item)
+                menu_item.show()
+            menu.popup(None, None, None, event.button, event.time)
+            return True
+            
+        if _p.rcParams['refigure.keyboardcontrol']:
+            # On click, grab the focus.  Return True so that event doesn't bubble up to the
+            # TextView, which would grab focus right back.
+            widget.grab_focus()
+            return True
+            
+        return False
 
     def create_widget(self):
         c = self.canvas.switch_backends(_FigureCanvas)
@@ -216,20 +252,20 @@ class SuperFigure(_Figure, _custom_result.CustomResult):
         box.pack_start(c, True, True)
         c.set_size_request(*map(int, self.get_size_inches()*self.get_dpi()))
         
+        # Always create toolbar, even if it is not shown.  We use it to populate the context menu.
+        self.toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
         if self._toolbar:
-            toolbar = _NavigationToolbar(c, None) # Last is supposed to be window?
+            # Pack and show toolbar.
             e = _gtk.EventBox() # For setting cursor
-            e.add(toolbar)
+            e.add(self.toolbar)
             box.pack_end(e, False, False)
-            toolbar.connect("realize", lambda widget:
+            self.toolbar.connect("realize", lambda widget:
                 widget.window.set_cursor(_gtk.gdk.Cursor(_gtk.gdk.LEFT_PTR)))
         
+        c.connect("button_press_event", self._button_press_event)
         if _p.rcParams['refigure.keyboardcontrol']:
             # Create a FigureManager for the canvas to handle key_press_events
             _FigureManager(c, 0)
-            # On click, grab the focus.  Return True so that event doesn't bubble up to the
-            # TextView, which would grab focus right back.
-            c.connect("button_press_event", lambda widget, event: widget.grab_focus() or True)
             # Key presses are handled by the canvas already, but need to return True so that
             # event doesn't bubble up to the TextView and cause it to insert a character.
             c.connect("key_press_event", lambda widget, event: True)
